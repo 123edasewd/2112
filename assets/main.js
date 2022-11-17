@@ -317,10 +317,13 @@
 					for (i=0; i < a.length; i++) {
 	
 						// Load.
-							a[i].src = a[i].dataset.src;
+							a[i].contentWindow.location.replace(a[i].dataset.src);
+	
+						// Save initial src.
+							a[i].dataset.initialSrc = a[i].dataset.src;
 	
 						// Mark as loaded.
-							a[i].dataset.src = "";
+							a[i].dataset.src = '';
 	
 					}
 	
@@ -382,10 +385,17 @@
 								continue;
 	
 						// Mark as unloaded.
-							a[i].dataset.src = a[i].src;
+	
+							// IFRAME was previously loaded by loadElements()? Use initialSrc.
+								if ('initialSrc' in a[i].dataset)
+									a[i].dataset.src = a[i].dataset.initialSrc;
+	
+							// Otherwise, just use src.
+								else
+									a[i].dataset.src = a[i].src;
 	
 						// Unload.
-							a[i].src = '';
+							a[i].contentWindow.location.replace('about:blank');
 	
 					}
 	
@@ -560,7 +570,6 @@
 	
 			}
 	
-	// Scroll events.
 		var scrollEvents = {
 	
 			/**
@@ -580,7 +589,7 @@
 					triggerElement: (('triggerElement' in o && o.triggerElement) ? o.triggerElement : o.element),
 					enter: ('enter' in o ? o.enter : null),
 					leave: ('leave' in o ? o.leave : null),
-					mode: ('mode' in o ? o.mode : 1),
+					mode: ('mode' in o ? o.mode : 3),
 					offset: ('offset' in o ? o.offset : 0),
 					initialState: ('initialState' in o ? o.initialState : null),
 					state: false,
@@ -849,7 +858,7 @@
 						scrollEvents.add({
 							element: i,
 							enter: enterHandler,
-							offset: 250
+							offset: 250,
 						});
 	
 				});
